@@ -1,0 +1,13 @@
+{:paths ["src" "resources"]
+ :deps {nrepl/nrepl {:mvn/version "0.9.0"}
+        cider/cider-nrepl {:mvn/version "0.28.5"}
+        org.clojure/core.async {:mvn/version "1.5.648"}
+        io.github.nubank/morse {:git/tag "v2023.04.30.01" :git/sha "d99b09c"}
+        clj-http/clj-http {:mvn/version "3.12.3"}
+        com.datomic/peer {:mvn/version "1.0.7075"
+                          :exclusions [org.slf4j/slf4j-nop
+                                       org.slf4j/slf4j-log4j12]}}
+ :aliases {:run {:exec-fn gbatalk.talk/run}
+           :dev {:extra-deps {io.github.nubank/morse {:git/tag "v2023.04.30.01"
+                                                      :git/sha "d99b09c"}}
+                 :main-opts ["-m" "nrepl.cmdline" "--middleware" "[cider.nrepl/cider-middleware]"]}}}
