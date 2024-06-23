@@ -209,3 +209,16 @@
 (pprint (get-pix-requests-for-random-customer conn))
 
 
+(defn permutations
+  [s]
+  (println s)
+  (if (empty? s)
+    '(()))
+  (for [x s
+        p (permutations (remove #{x} s))]
+    (cons x p)))
+
+
+
+
+
