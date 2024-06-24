@@ -61,7 +61,19 @@
     :db/cardinality :db.cardinality/one}
    {:db/ident :savings-account/customer-id
     :db/valueType :db.type/uuid
-    :db/cardinality :db.cardinality/one}])
+    :db/cardinality :db.cardinality/one}
+   {:db/ident :pix-transfer-out-request/succeeded
+    :db/valueType :db.type/ref
+    :db/cardinality :db.cardinality/one}
+   {:db/ident :pix-transfer-out-succeeded/id
+    :db/cardinality :db.cardinality/one
+    :db/valueType :db.type/uuid}
+   {:db/ident :pix-transfer-out-succeeded/succeeded-at
+    :db/cardinality :db.cardinality/one
+    :db/valueType :db.type/instant}
+   {:db/ident :pix-transfer-out-succeeded/pix-transfer-out-request
+    :db/cardinality :db.cardinality/one
+    :db/valueType :db.type/ref}])
 
 @(d/transact conn schema)
 
@@ -195,21 +207,20 @@
                           (d/db conn))]
     (rand-nth (map first customer-ids))))
 
-(defn get-pix-requests-for-random-customer [conn]
-  (let [random-customer-id (get-random-customer-id-with-pix conn)]
-    (d/query {:query '[:find ?sa ?pix
-                :in $ ?cid
-                :where
-                [?sa :savings-account/customer-id ?cid]
-                [?pix :pix-transfer-out-request/savings-account ?sa]]
-              :args [ (d/db conn) random-customer-id]
-              :io-context :gba-presentation/query-4
-              :query-stats true})))
 
-(pprint (get-pix-requests-for-random-customer conn))
+ (pprint (let [random-customer-id (get-random-customer-id-with-pix conn)]
+          (d/query {:query '[:find ?sa ?pix
+                             :in $ ?cid
+                             :where
+                             [?sa :savings-account/customer-id ?cid]
+                             [?pix :pix-transfer-out-request/savings-account ?sa]]
+                    :args [(d/db conn) random-customer-id]
+                    :io-context :gba-presentation/query-4
+                    :query-stats true})))
 
 
-(defn permutations
+
+#_(defn permutations
   [s]
   (println s)
   (if (empty? s)
@@ -217,6 +228,48 @@
   (for [x s
         p (permutations (remove #{x} s))]
     (cons x p)))
+
+
+(pprint (let [random-customer-id (get-random-customer-id-with-pix conn)]
+          (d/query {:query '[:find ?sa ?pix
+                             :in $ ?cid
+                             :where
+                             [?pix :pix-transfer-out-request/savings-account ?sa]
+                             [?sa :savings-account/customer-id ?cid]]
+                    :args [(d/db conn) random-customer-id]
+                    :io-context :gba-presentation/query-5
+                    :query-stats true})))
+
+
+
+;;;;;;;;;;;;;; transactions
+
+
+(get-random-ptor-ids)
+
+(defn get-pix-transfer-out-request
+  []
+  (let [db (d/db conn)
+        query '[:find ?e
+                :where
+                [?e :pix-transfer-out-request/id #uuid "66776b8c-53dd-4e94-8fab-d13a623059a5"]]
+        result (d/q query db)]
+    (ffirst result)))
+
+
+
+@(d/transact conn [{:pix-transfer-out-request/id (random-uuid)
+                   :pix-transfer-out-request/amount 15M
+                   :pix-transfer-out-request/message "new message"}] :io-context :darlei/presentation)
+
+
+
+
+;; insert one
+
+
+;; gets entire entity and update one item
+
 
 
 
