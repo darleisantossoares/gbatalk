@@ -135,7 +135,7 @@
    :source/type "source-type"})
 
 
-#_(dotimes [_ 1000000]
+#_(dotimes [_ 200000]
   (let [source (create-source)]
     @(d/transact conn (create-pix-transfer-out-request source))))
 
@@ -148,8 +148,9 @@
     @(d/transact conn (create-pix-transfer-out-request source)))))
 
 
+(println (get-random-ptor-ids))
 
-(println (rand-nth savings-account-ids))
+(def random-ptor (get-random-ptor-ids))
 
 
 
@@ -162,8 +163,8 @@
 (pprint (d/query {:query '[:find (pull ?pix [*])
                            :in $
                            :where
-                           [?pix :pix-transfer-out-request/scheduled-to  #inst "2024-09-22T00:25:32.476"]
-                           [?pix :pix-transfer-out-request/id #uuid "66776b7c-0005-4a34-8ef8-04f6d4709576"]
+                           [?pix :pix-transfer-out-request/scheduled-to  #inst "2024-09-10T16:45:27.471-00:00"]
+                           [?pix :pix-transfer-out-request/id #uuid "6679a2a7-1bda-4f36-8b81-02f2a7ff0533"]
                            ]
                   :args [(d/db conn)]
                   :io-context :gba-presentation/query-1
@@ -174,8 +175,8 @@
 (pprint (d/query {:query '[:find (pull ?pix [*])
                             :in $
                             :where
-                           [?pix :pix-transfer-out-request/id #uuid "66776b7c-0005-4a34-8ef8-04f6d4709576"]
-                           [?pix :pix-transfer-out-request/scheduled-to  #inst "2024-09-22T00:25:32.476"]]
+                           [?pix :pix-transfer-out-request/id  #uuid "6679a2a7-1bda-4f36-8b81-02f2a7ff0533"]
+                           [?pix :pix-transfer-out-request/scheduled-to   #inst "2024-09-10T16:45:27.471-00:00"]]
                    :args [(d/db conn)]
                    :io-context :gba-presentation/query-2
                    :query-stats true}))
@@ -184,14 +185,13 @@
 
 (println "========")
 
-(get-random-ptor-ids)
 (println (get-random-customer-id))
 
 
 (pprint (d/query {:query '[:find ?pix
                            :in $
                            :where
-                           [?savings-account :savings-account/customer-id #uuid "b3bfe834-c798-4d71-bb63-bb53eb7df6b7"]
+                           [?savings-account :savings-account/customer-id #uuid "d6f04b87-cbfe-4ceb-bb08-27c147f11fbf"]
                            [?pix :pix-transfer-out-request/savings-account ?savings-account]]
                   :args [(d/db conn)]
                   :io-context :gba-presentation/query-3
@@ -265,13 +265,9 @@
 
 
 
-;; insert one
-
-
-;; gets entire entity and update one item
 
 
 
 
-
+(pprint (d/db-stats (d/db conn)))
 
